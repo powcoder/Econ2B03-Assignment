@@ -1,0 +1,121 @@
+---
+title: "2B03 Assignment 1"
+subtitle: "Descriptive Statistics (Chapters 1 & 2)"
+author: "Your Name and Student ID"
+date: "Due Wednesday September 18 2019 (due in class prior to the start of the lecture)"
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+---
+
+> Instructions: *You are to use R Markdown for generating your assignment (see the item Assignments and R Markdown on the course website for helpful tips and pointers).*
+
+1. Define the following terms in a sentence (or *short* paragraph) and state a formula if appropriate (this question is worth 5 marks). 
+
+
+    i. Random Sample
+        
+    i. Frequency Distribution
+
+    i. Quantitative Data
+
+    i. Sample Median
+  
+    i. Cross Tabulations
+
+1. Consider the following dataset on the final grade received in a particular course (`grade`) and attendance (`attend`, number of times present when work was handed back during the semester out of a maximum of six times). Note that R has the ability to read datafiles directly from a URL, so here (unlike the `odesi` data that you manually retrieve) you do not have to manually download the data *providing you are connected to the internet* (this question is worth 8 marks).
+  
+    ```{r, eval=FALSE}
+    course <- read.table("https://socialsciences.mcmaster.ca/racinej/2B03/files/attend.RData")
+    attach(course)
+    ```
+
+    i. Create a scatterplot of the data with `attend` on the horizontal axis and `grades` on the vertical axis via the command
+
+        ```{r, eval=FALSE}
+        plot(attend,grade)
+        ```
+
+        Do you see any pattern present in the data? If so describe it in your own words.
+
+    i. Construct the average grades for persons attending 0 times, and then repeat for those attending 1 time, 2 times, and so on through 6 times using something like
+
+        ```{r, eval=FALSE}    
+        mean(grade[attend==0])
+        ```
+
+        Do you see any pattern present in the means? 
+
+1. This question requires you to download data obtained from Statistics Canada. If you are working on campus go to www.odesi.ca (off campus users must first sign into the McMaster library via libaccess at  library.mcmaster.ca/libaccess, search for odesi via the library search facilities then select odesi from these search results). Next, select the "Find data" field in odesi and search for "Labour Force Survey June, 2019", then scroll down and select the *Labour Force Survey, June 2019 [Canada]*. Next click on the "Explore & Download" icon, then click on the download icon (i.e., the *diskette* icon, square, along the upper right of the browser pane) and then click on "Select Data Format" then scroll down and select "Comma Separated Value file" (csv) which, after a brief pause, will download the data to your hard drive (you may have to extract the file from a zip archive depending on which operating system you are using). Finally, make sure that you place this csv file in the same directory/folder as your R code file (this file ought to have the name *LFS-71M0001-E-2019-June_F1.csv*, and in RStudio select the menu item Session -> Set Working Directory -> To Source File Location). There will be another file with (almost) the same name but with the extension .pdf that is the pdf documentation that describes the variables in this data set. Note that it would be prudent to retain this file as we will use it in future assignments (this question is worth 8 marks).
+
+    Next, open RStudio, make sure this csv file and your R Markdown script are in the same directory (in RStudio open the Files tab (lower right pane by default) and refresh the file listing if necessary). Then read the file as follows:
+
+    ```{r, eval=FALSE}
+    lfp <- read.csv("LFS-71M0001-E-2019-June_F1.csv")
+    ```
+    
+    This data set contains some interesting variables on the labour force status of a random subset of Canadians. We will focus on the variable `HRLYEARN` (hourly earnings) described on page 22 of the pdf file *LFS-71M0001-E-2019-June.pdf*. We will also consider other variables so that we can condition our analysis on these variables by restricting attention to subsets of the data, e.g., for full-time workers only (`FTPTMAIN==1`) reporting positive earnings. We also look at the highest educational attainment for people in the survey and consider both high school graduates (`EDUC==2`) and those holding a bachelors degree (`EDUC==5`). To construct these subsets we can use the R command `subset` as follows (the ampersand is the logical operator *and* - see `?subset` for details on the `subset` command):
+
+    ```{r, eval=FALSE}
+    hs <- subset(lfp, FTPTMAIN==1 & EDUC==2 & HRLYEARN > 0)$HRLYEARN    
+    ba <- subset(lfp, FTPTMAIN==1 & EDUC==5 & HRLYEARN > 0)$HRLYEARN
+    ```
+
+    These commands simply tell R to take a subset of the data frame `lfp` for full-time workers having either a high school diploma or university bachelors degree for those reporting positive earnings, and then retain only the variable `HRLYEARN` and store these in the variables named `hs` (hourly earnings for high-school graduates) or `ba` (hourly earnings for university graduates). The following questions ask you to compute various descriptive statistics and other graphical summaries of these two variables.
+    
+    Note that nothing will be printed out by running the two lines above - they simply create subsets of the data for subsequent use.
+    
+    i. Report the five number summary for each subset (hint: `fivenum(hs)` etc.). Indicate what each number tells us (hint: see help by typing `?fivenum` in the console pane). 
+  
+    i. What can you say about relative wages of high school and university graduates?
+
+    i. Using Sturgess's' rule, how many classes would you construct for the `hs` and `ba` wage data (hint - `length()` gives you the length of the vector, `log10()` may also be useful)?
+  
+    i. Plot histograms for the `hs` and `ba` data on separate graphs (hint: `hist()`). 
+    
+    i. Do the number of classes correspond to Sturgess's rule?
+    
+    i. Plot density curves for the `hs` and `ba` data on the same graph and add a legend (hint: first use something like `plot(density(...),col="blue",lty=1)` (you need to fill in `(...)` parts with your data object) then `lines(density(...),col="red",lty=2)`, then see the help page by typing `?legend` in the console pane. Note that you can add a legend using something like 
+    
+        ```{r,eval=FALSE}
+        legend("topright",c("High School","University"),
+               lty=c(1,2),col=c("blue","red"),bty="n")
+        ```
+  
+    i. What do these density curves tell us about the distribution of hourly wages for high school versus university graduates?
+
+1. Consider the following data on annual profits (in $millions of dollars) for all firms in the textbook publishing industry in Canada (ignore the `##  [1]` and `##  [12]` that appear at the beginning of each line; this is simply the way R displays a vector of numbers):
+
+    ```{r, echo=FALSE}
+    n <- 15
+    set.seed(123)
+    profits <- signif(rnorm(n,mean=10,sd=5),3)
+    profits
+    ```
+
+    To set these values in a vector in R, if desired, you can use the command `profits <- c(...)` where `...` are the values above separated by commas, e.g., `profits <- c(3.67, 6.57, etc.)`
+
+    Complete the table below showing the absolute frequency, relative frequency, cumulative frequency, and cumulative relative frequency for the above data.  Use Sturgess's rule to obtain the desired number of classes, and use the range of the data when constructing your class boundaries (note that you need to have a blank line between each new row that you add to the table, and the last class must be closed at the right - this question is worth 8 marks).
+
+    -----------------------------------------------------------
+                                          Cumulative Cumulative
+                     Absolute  Relative   Absolute   Relative
+    Class            Frequency Frequency  Frequency  Frequency
+    ---------------  --------- ---------- ---------- ----------
+    [...,...)        ...       ...        ...        ...    
+    
+    [...,...)        ...       ...        ...        ...   
+    
+    [...,...]        ...       ...        ...        ...     
+    -----------------------------------------------------------
+
+
+1. Since we use the *summation operator* ($\Sigma_{i=1}^n$) often in class, let's make sure we understand how to calculate objects that can be expressed succinctly using this operator. You must show all steps.
+
+    i. Care must be exercised when expanding certain sums. Provide an example to demonstrate that it is generally not true that $\sum^{n}_{i=1} X^{2}_{i} = \left(\sum^{n}_{i=1} X_{i}\right)^{2}$. Use a value of $n$ which is at least as large as 3 (hint: e.g. if you let $n=2$ [don't!] and used $X_1=2$, $X_2=-3$, calculate $\sum^{2}_{i=1} X^{2}_{i}$ and $\left(\sum^{2}_{i=1} X_{i}\right)^{2}$ - this question is worth 2 marks).
+	
+    i. Express $\sum_{i=1}^n K$, where $K$ is a constant (i.e., a number that does not change hence has no subscript $i$), in terms of $n$ and $K$ only (Hint - a constant does not have a subscript as it does not change with $i$, but it is being added/summed, so write out a string of $n$ constants etc.). Then for $K=3$ and $n=5$ determine $\sum_{i=1}^n K$ using your result purely using $n$ and $K$ (i.e., without a summation sign - this question is worth 2 marks).
+
+    i. Let the sample size be $n=3$, and let $X_1=1$, $X_2=-1$, and $X_3=3$. Compute the sample mean $\bar X=\sum_{i=1}^n X_k/n$ then compute the sample standard deviation $\hat\sigma=\sqrt{\sum_{i=1}^n(X_i-\bar X)^2/(n-1)}$ in two ways: longhand (you can use R and use longhand notation, e.g., X[1], X[2], and X[3] or 1, -1, and 3, whichever you prefer), then using R functions sucn as mean() and sd() (this question is worth 2 *bonus* marks).
+    
